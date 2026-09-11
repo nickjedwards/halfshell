@@ -34,10 +34,15 @@ Item {
         anchors.rightMargin: Config.tilePadX
         spacing: 10
 
+        // The mark says what the figure beside it says — a tenth of charge
+        // per step — and wears a bolt only while charge is going in. Plugged
+        // in and holding at a limit, or full, is the plain ladder: the line
+        // beside it is what says so.
         TileIcon {
             Layout.alignment: Qt.AlignVCenter
-            kind: "battery"
+            kind: Battery.charging ? "batteryCharging" : "battery"
             size: 15
+            level: Battery.level
             color: Battery.low ? Config.urgent : Config.textDim
         }
 

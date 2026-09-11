@@ -841,7 +841,21 @@ MDI's fan-shaped strength glyphs, not the arcs of its plain `wifi` mark,
 because only the fans come in steps; `ToggleTile` gained a `level`
 passthrough to carry it, which every other tile leaves at the top.
 
-All three default to the top, so any other use of those marks — the output
+The battery takes ten steps rather than four, because the card prints the
+percentage right next to it: 58% gets MDI's 60 glyph, so the mark and the
+figure never disagree. While charge is going in it swaps to the charging
+ladder — the same ten fills with a bolt beside them — and only while it is:
+`PendingCharge` is plugged in and holding at a charge limit, where a bolt
+would claim something that isn't happening. That is the distinction
+`Battery.detail` already draws in words, and `Battery.charging` now draws in
+the mark. There is no
+`battery_alert` at the bottom of the run: the reading and the mark both turn
+red under 15%, and two alarms in the same fifteen pixels is one too many.
+Both ladders are written out as tables rather than counted off a first
+codepoint, because only the plain run is consecutive — MDI added charging 10,
+50 and 70 long after the rest, and they sit a full `0x800` away from it.
+
+All four default to the top, so any other use of those marks — the output
 tile's badge, which is about which device is selected rather than how loud
 it is — shows the whole mark without being told anything.
 

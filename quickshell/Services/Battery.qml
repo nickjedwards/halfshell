@@ -23,6 +23,13 @@ Singleton {
     readonly property bool discharging: root.state === UPowerDeviceState.Discharging
     readonly property bool low: root.discharging && root.level < 0.15
 
+    // Charge actually going in — what the mark draws a bolt for. Not merely
+    // on mains: PendingCharge is plugged in and holding at a charge limit,
+    // and a bolt there would claim energy is flowing when none is. Full is
+    // the same. Both say where they stand in `detail` instead, which is the
+    // distinction this file exists to make.
+    readonly property bool charging: root.state === UPowerDeviceState.Charging
+
     readonly property string detail: {
         if (!root.available)
             return "";

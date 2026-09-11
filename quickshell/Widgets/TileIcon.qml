@@ -19,8 +19,9 @@ Item {
     id: root
 
     // "wifi" | "bluetooth" | "output" | "input" | "brightness" | "keyboard"
-    // | "back" | "search" | "cpu" | "temp" | "memory" | "battery" | "close"
-    // | "bell" | "power" | "restart" | "lock" | "logout"
+    // | "back" | "search" | "cpu" | "temp" | "memory" | "battery"
+    // | "batteryCharging" | "close" | "bell" | "power" | "restart" | "lock"
+    // | "logout"
     required property string kind
     required property color color
 
@@ -31,9 +32,9 @@ Item {
     // notification count.
     property bool filled: false
 
-    // 0..1, read by the three marks that stand for a quantity. The speaker,
-    // the sun and the wifi fan each have MDI glyphs for a few levels, and
-    // this picks between them. It defaults to the top, so a use of one of
+    // 0..1, read by the four marks that stand for a quantity. The speaker,
+    // the sun, the wifi fan and the battery each have MDI glyphs for a few
+    // levels, and this picks between them. It defaults to the top, so a use of one of
     // those marks that isn't about the quantity — the output tile's badge,
     // which is about which device is selected rather than how loud it is —
     // shows the whole mark without being told anything.
@@ -54,13 +55,25 @@ Item {
             cpu: 0xF035B,       // memory — reads as a CPU
             memory: 0xF061A,    // chip — reads as RAM
             temp: 0xF050F,      // thermometer
-            battery: 0xF0079,   // battery
             close: 0xF0156,     // close
             power: 0xF0425,     // power
             restart: 0xF0709,   // restart
             lock: 0xF033E,      // lock
             logout: 0xF0343     // logout
         })
+
+    // The battery's two ladders, empty to full: ten glyphs each, a tenth of
+    // charge per step. Written out rather than counted off a first codepoint,
+    // because only the plain run is consecutive — MDI drew 10 through 90 and
+    // the solid full one together, but added charging 10, 50 and 70 long
+    // afterwards, so those three sit a full 0x800 away from their own run.
+    readonly property var batterySteps: [0xF007A, 0xF007B, 0xF007C, 0xF007D, 0xF007E, 0xF007F, 0xF0080, 0xF0081, 0xF0082, 0xF0079]
+    readonly property var batteryChargingSteps: [0xF089C, 0xF0086, 0xF0087, 0xF0088, 0xF089D, 0xF0089, 0xF089E, 0xF008A, 0xF008B, 0xF0085]
+
+    function batteryGlyph(t: real, charging: bool): int {
+        const steps = charging ? root.batteryChargingSteps : root.batterySteps;
+        return steps[Math.max(0, Math.min(steps.length - 1, Math.round(t * 10) - 1))];
+    }
 
     readonly property int codepoint: {
         const t = Math.max(0, Math.min(1, root.level));
@@ -122,6 +135,16 @@ Item {
         // keyboard_off, whose slash says the keyboard itself is disabled.
         case "keyboard":
             return t > 0 ? 0xF030C : 0xF097B; // keyboard / keyboard_outline
+
+        // Ten steps rather than the four the speaker and the sun get, because
+        // the percentage is printed right beside this one: 58% takes the 60
+        // glyph, so the mark and the figure never disagree. No battery_alert
+        // at the bottom of the run — the reading and the mark both go red
+        // under 15%, and two alarms in the same fifteen pixels is one too
+        // many.
+        case "battery":
+        case "batteryCharging":
+            return root.batteryGlyph(t, root.kind === "batteryCharging");
 
         default:
             return root.glyphs[root.kind] || 0;

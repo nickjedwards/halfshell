@@ -14,7 +14,7 @@
 
 pkgname=halfshell-git
 _pkgname=halfshell
-pkgver=r2.6e2b6b0
+pkgver=r3.402aa9b
 pkgrel=1
 pkgdesc='A NotchNook-style notch for Hyprland, built on Quickshell'
 arch=('any')
