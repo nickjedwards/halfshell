@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+# halfshell: Quickshell pointed at the installed shell.
+#
+#   halfshell                        run it in the foreground
+#   halfshell -d -n                  detach, unless it is already running
+#   halfshell ipc call notch toggle  talk to the running one
+#   halfshell kill | list | log      ditto
+#
+# The shell is named by path, so nothing has to be registered under
+# ~/.config/quickshell for `qs -c` to find. The path goes on the command line
+# rather than in QS_CONFIG_PATH, which qs also reads: the shell launches
+# applications, every one of them would inherit the variable, and `qs -c` run
+# from any of them would then refuse to start, because --config excludes
+# --path.
+#
+# The two values below are filled in by make, from PKGDATADIR and QS.
+set -eu
+
+pkgdatadir='@PKGDATADIR@'
+qs='@QS@'
+
+case "${1-}" in
+    ipc | kill | list | log)
+        subcommand=$1
+        shift
+        exec "$qs" "$subcommand" -p "$pkgdatadir" "$@"
+        ;;
+    *)
+        exec "$qs" -p "$pkgdatadir" "$@"
+        ;;
+esac

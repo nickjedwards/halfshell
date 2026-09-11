@@ -1,0 +1,6 @@
+/build/
+/quickshell/.qmlls.ini
+/dist/arch/src/
+/dist/arch/pkg/
+/dist/arch/*.pkg.tar.*
+/dist/arch/halfshell/

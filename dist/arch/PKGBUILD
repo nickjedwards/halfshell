@@ -1,0 +1,71 @@
+# Maintainer: nick <nick@endever.com.au>
+#
+# Builds halfshell from the tip of main on GitHub, so pacman owns every file
+# instead of `sudo make install` leaving them in /usr/local where nothing
+# tracks them. It builds what has been pushed, not what is in the checkout
+# this file sits in, so commit and push first.
+#
+#   cd dist/arch && makepkg -si
+#
+# A -git package, which is what the AUR asks of one built from a branch:
+# pkgver is worked out from the commit it builds, so every new commit is an
+# upgrade, and it provides and conflicts with plain halfshell so that a
+# release package can replace it once there is one.
+
+pkgname=halfshell-git
+_pkgname=halfshell
+pkgver=r1.ff66909
+pkgrel=1
+pkgdesc='A NotchNook-style notch for Hyprland, built on Quickshell'
+arch=('any')
+url='https://github.com/nickjedwards/halfshell'
+# LICENSE is the GPL v3 text, with no "or any later version" notice anywhere
+# in the source, so -only. Add that notice and this becomes -or-later.
+license=('GPL-3.0-only')
+depends=(
+  'quickshell'
+  # Every icon is a glyph from it; without it each one is a missing-glyph box.
+  'ttf-nerd-fonts-symbols'
+)
+makedepends=('git')
+optdepends=(
+  'hyprland: workspace dots and log out'
+  'inter-font: the typeface the design is drawn in'
+  'pipewire: volume and audio devices'
+  'upower: battery'
+  'power-profiles-daemon: power profiles'
+  'networkmanager: wifi'
+  'bluez: bluetooth'
+  'brightnessctl: the brightness slider'
+  'cava: the spectrum around the album art'
+  "hyprlock: the power menu's default lock command"
+  "hyprpaper: the wallpaper picker's default wallpaper daemon"
+)
+provides=("$_pkgname")
+conflicts=("$_pkgname")
+source=("$_pkgname::git+$url.git#branch=main")
+# A branch has no fixed contents to check a sum against.
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "$_pkgname"
+  # No tags yet, so the AUR's usual fallback: r<commit count>.<short hash>.
+  printf 'r%s.%s' "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
+}
+
+build() {
+  cd "$_pkgname"
+  make PREFIX=/usr
+}
+
+check() {
+  cd "$_pkgname"
+  make PREFIX=/usr check
+}
+
+package() {
+  cd "$_pkgname"
+  make PREFIX=/usr DESTDIR="$pkgdir" install
+  install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

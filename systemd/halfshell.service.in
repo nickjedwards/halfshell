@@ -1,0 +1,16 @@
+[Unit]
+Description=halfshell, a notch for Hyprland
+# Started with the graphical session and stopped with it. That needs a session
+# which reaches graphical-session.target — uwsm does, a bare Hyprland started
+# from a TTY does not — with WAYLAND_DISPLAY in the user manager's environment.
+PartOf=graphical-session.target
+After=graphical-session.target
+Requisite=graphical-session.target
+
+[Service]
+Type=exec
+ExecStart=@BINDIR@/halfshell
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target
