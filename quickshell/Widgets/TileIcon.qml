@@ -18,9 +18,9 @@ import qs.Common
 Item {
     id: root
 
-    // "wifi" | "bluetooth" | "output" | "input" | "brightness" | "back"
-    // | "search" | "cpu" | "temp" | "memory" | "battery" | "close" | "bell"
-    // | "power" | "restart" | "lock" | "logout"
+    // "wifi" | "bluetooth" | "output" | "input" | "brightness" | "keyboard"
+    // | "back" | "search" | "cpu" | "temp" | "memory" | "battery" | "close"
+    // | "bell" | "power" | "restart" | "lock" | "logout"
     required property string kind
     required property color color
 
@@ -115,6 +115,13 @@ Item {
 
         case "bell":
             return root.filled ? 0xF009A : 0xF009C; // bell / bell_outline
+
+        // Lit or dark, not a scale: MDI has no steps for a keyboard, and the
+        // slider beside it already says how bright. The outline when the
+        // light is off, like the bell's with nothing waiting — not
+        // keyboard_off, whose slash says the keyboard itself is disabled.
+        case "keyboard":
+            return t > 0 ? 0xF030C : 0xF097B; // keyboard / keyboard_outline
 
         default:
             return root.glyphs[root.kind] || 0;

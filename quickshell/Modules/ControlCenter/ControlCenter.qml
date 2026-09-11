@@ -40,9 +40,9 @@ Item {
 
     onVisibleChanged: {
         if (visible) {
-            // The backlight routinely changes behind our back — laptop
-            // brightness keys don't go through this shell — so re-read it on
-            // the way in rather than polling for it.
+            // The backlights routinely change behind our back — laptop
+            // brightness keys don't go through this shell — so re-read them
+            // on the way in rather than polling for them.
             Brightness.refresh();
         } else {
             // Always come back to the main page. Reopening the notch onto a
@@ -265,15 +265,29 @@ Item {
 
                 SliderRow {
                     Layout.fillWidth: true
-                    visible: Brightness.available
+                    visible: Brightness.display.available
                     kind: "brightness"
                     label: "Brightness"
-                    value: Brightness.value
+                    value: Brightness.display.value
 
                     // The sun grows with the backlight, the way the speaker
                     // below counts its waves off the volume.
-                    level: Brightness.value
-                    onMoved: v => Brightness.set(v)
+                    level: Brightness.display.value
+                    onMoved: v => Brightness.display.set(v)
+                }
+
+                // The keyboard's own light, on machines that have one. It
+                // goes all the way off, which the screen never does, and the
+                // mark says so: the keys drawn in outline when it is dark.
+                SliderRow {
+                    Layout.fillWidth: true
+                    Layout.topMargin: 12
+                    visible: Brightness.keyboard.available
+                    kind: "keyboard"
+                    label: "Keyboard"
+                    value: Brightness.keyboard.value
+                    level: Brightness.keyboard.value
+                    onMoved: v => Brightness.keyboard.set(v)
                 }
 
                 SliderRow {

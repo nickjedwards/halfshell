@@ -14,7 +14,7 @@
 
 pkgname=halfshell-git
 _pkgname=halfshell
-pkgver=r1.ff66909
+pkgver=r2.6e2b6b0
 pkgrel=1
 pkgdesc='A NotchNook-style notch for Hyprland, built on Quickshell'
 arch=('any')
@@ -36,7 +36,7 @@ optdepends=(
   'power-profiles-daemon: power profiles'
   'networkmanager: wifi'
   'bluez: bluetooth'
-  'brightnessctl: the brightness slider'
+  'brightnessctl: the screen and keyboard brightness sliders'
   'cava: the spectrum around the album art'
   "hyprlock: the power menu's default lock command"
   "hyprpaper: the wallpaper picker's default wallpaper daemon"

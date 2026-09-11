@@ -20,6 +20,7 @@ application launcher in the same notch.
   - [x] Audio input/output devices
   - [x] Battery (power settings)
   - [x] Brightness
+  - [x] Keyboard backlight
   - [ ] Tailscale (Nice to have)
 - [x] Notification center (toggleable by IPC)
   - [x] Action buttons
@@ -125,7 +126,8 @@ is the one most likely to need changing, and swapping in `swaylock` or
 `gtklock` is a one-line edit.
 Optional but used when present: PipeWire (volume, audio devices), UPower
 (battery), NetworkManager (wifi), BlueZ (bluetooth), and `brightnessctl` on
-`PATH` for the brightness slider — without it that row simply hides.
+`PATH` for the screen and keyboard brightness sliders — without it those rows
+simply hide, as the keyboard's does on a machine with no keyboard backlight.
 
 **Fonts**: the design assumes Inter. Change `font` in `config.json` if you
 don't have it — Qt will fall back to a default sans otherwise, which will look
@@ -258,7 +260,8 @@ quickshell/                      The shell; `make install` puts it in share/half
     Wifi.qml                     WiFi state, reduced to what the tile shows.
     Bt.qml                       Bluetooth state, ditto.
     Audio.qml                    Pipewire devices, volume, and switching between them.
-    Brightness.qml               Backlight, via brightnessctl.
+    Brightness.qml               The screen's backlight and the keyboard's.
+    Backlight.qml                One backlight, via brightnessctl.
     Apps.qml                     Desktop entries, and the search over them.
     Wallpaper.qml                The pictures on disk, and the link that names one.
     SysMon.qml                   CPU load, CPU temperature and memory use.
@@ -755,7 +758,7 @@ running into the rule underneath it and the panel's edge above.
 **Quickshell builds every singleton at startup, so a `Process` left
 `running: true` in one is a process at every launch and every config
 reload.** That is right for the two whose answers decide *layout* —
-`SysMon`'s hwmon probe sets `hasTemperature` and `Brightness`'s query sets
+`SysMon`'s hwmon probe sets `hasTemperature` and `Brightness`'s queries set
 `available`, and both gate a `visible:` on a control-centre row, so a
 deferred answer would pop a row into existence after the panel was already
 on screen.
@@ -880,6 +883,19 @@ sixty processes a second. A reading that arrives while a drag is in progress
 is discarded rather than fighting the drag. Nothing polls the backlight —
 `ControlCenter` re-reads it when the panel becomes visible, which covers the
 brightness keys changing it behind the shell's back.
+
+**The keyboard backlight is the same thing pointed at a different device.**
+`Backlight.qml` is the query, the coalesced writes and the parsing, and
+`Brightness` holds two of them. The keyboard's is found by name rather than
+by class: the kernel calls every keyboard backlight `*::kbd_backlight`,
+whoever made the machine, so nothing here has to know it is running on a
+Framework or a ThinkPad. It can go all the way to zero, which the screen
+never does, and its mark says so — the keys solid while lit, in outline when
+dark. A machine without one simply has no row. On one with only a few
+levels, the slider settles on whichever level the write landed on, because
+the reading that comes back from the write replaces the value the drag set.
+The control centre grew by exactly the row — 26 for the slider, 12 above it —
+so every other gap in it is what it was.
 
 **A panel takes the keyboard when it was asked for, never when it was
 hovered into.** A layer-shell surface has to request keyboard focus

@@ -183,9 +183,10 @@ JsonAdapter {
     // The control centre: a status header over a body of controls. The
     // sliders are bottomed and everything else hangs from the top, so a taller
     // header (calHeight) has to be paid for here or it squeezes the gap above
-    // Brightness.
+    // Brightness — and so does another slider. The keyboard's took this from
+    // 460 to 498: a SliderRow is 26 tall, and 12 more sit above it.
     property real ccWidth: 480
-    property real ccHeight: 460
+    property real ccHeight: 498
 
     // The window is built once at the size of the largest state and never
     // resized, so it needs to know what that is.
